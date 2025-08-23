@@ -82,7 +82,7 @@ class TernarySearchTree:
 
         return strings
 
-    def search(self, string):
+    def search(self, string, exact=False):
         node = self._root
         index = 0
         while node is not None:
@@ -93,6 +93,8 @@ class TernarySearchTree:
                 node = node._gt
             elif current == node._char:
                 if index == len(string) - 1:
+                    if exact:
+                        return node._string == string
                     return True
                 index += 1
                 node = node._eq
