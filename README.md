@@ -18,6 +18,34 @@ The data structure should support the following operations:
 
 # Implementation
 We implemented two classes, one to represent a node of ternary search tree, the second to represent the ternary search tree. TernarySearchTree is exported from the module ad will be used by users. Node class is only for internal usage.
+## Data Structure
+### Node
+- Fields: _char, _lt, _eq, _gt, _terminates, _string
+- Represents one character
+
+### TernarySearchTree
+
+- Field: _root (empty sentinel node)
+
+## Core Operations
+
+`insert(string)`
+- insert string into the tree
+- Marks `_terminates=True` at final character and records _string.
+- Handles empty string by marking root as `_terminates=True`.
+
+`search(string, exact=False)`
+- Walks per-character as in insert.
+- Returns:
+  - `True` if the path exists (prefix search) when exact=False or if terminal matches the full string when exact=True
+
+`all_strings()`
+- DFS over the tree and collecting every string.
+
+`__len__()` = number of stored strings (via `all_strings()`).
+
+`__repr__()` pretty-prints nodes and their branches.
+
 
 ### Time Complexity
 `insert` has linear time complexity O(n) for n will be length of the word. For each character, it traverses or create a node in ternary search tree. The comparison and insert happen in constant time. 
@@ -540,5 +568,92 @@ for word in hold_out_sample:
 
     136 μs ± 2.26 μs per loop (mean ± std. dev. of 7 runs, 10,000 loops each)
     
+
+```python
+nr_runs = 10
+btree_times, tst_times = {}, {}
+insert_sample = random.sample(words, k=20)
+for sample in samples:
+    tst = TernarySearchTree()
+    btree = Btree()
+    for word in sample:
+        tst.insert(word)
+        btree.insert(word)
+    tst_times[len(sample)] = 0.0
+    btree_times[len(sample)] = 0.0
+    for _ in range(nr_runs):
+        start_time = time.time_ns()
+        for word in insert_sample:
+            tst.insert(word)
+        end_time = time.time_ns()
+        tst_times[len(sample)] += end_time - start_time
+
+        start_time = time.time_ns()
+        for word in insert_sample:
+            btree.insert(word)
+        end_time = time.time_ns()
+        btree_times[len(sample)] += end_time - start_time
+
+    tst_times[len(sample)] /= nr_runs*1_000_000.0
+    btree_times[len(sample)] /= nr_runs*1_000_000.0
+
+```
+
+
+```python
+_ = plt.loglog(tst_times.keys(), tst_times.values(), label='Ternary Search Tree')
+_ = plt.loglog(btree_times.keys(), btree_times.values(), label='BTree')
+_ = plt.legend()
+```
+
+
+    
+![png](README_files/README_74_0.png)
+    
+
+
+
+```python
+nr_runs = 10
+btree_times, tst_times = {}, {}
+
+search_sample = random.sample(words, k=20)
+for sample in samples:
+    tst = TernarySearchTree()
+    btree = Btree()
+    for word in sample:
+        tst.insert(word)
+        btree.insert(word)
+    tst_times[len(sample)] = 0.0
+    btree_times[len(sample)] = 0.0
+    for _ in range(nr_runs):
+        start_time = time.time_ns()
+        for word in search_sample:
+            tst.search(word)
+        end_time = time.time_ns()
+        tst_times[len(sample)] += end_time - start_time
+        start_time = time.time_ns()
+        for word in search_sample:
+            btree.search(word)
+        end_time = time.time_ns()
+        btree_times[len(sample)] += end_time - start_time
+    tst_times[len(sample)] /= nr_runs*1_000_000.0
+    btree_times[len(sample)] /= nr_runs*1_000_000.0
+
+
+```
+
+
+```python
+_ = plt.loglog(tst_times.keys(), tst_times.values(), label='Ternary Search Tree')
+_ = plt.loglog(btree_times.keys(), btree_times.values(), label='BTree')
+_ = plt.legend()
+```
+
+
+    
+![png](README_files/README_76_0.png)
+    
+
 
 Btree performs better on inserts compared to our TernarySearchTree. TernarySearchTree performs better on search
