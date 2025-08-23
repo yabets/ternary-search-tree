@@ -7,26 +7,6 @@ class Node:
         self._terminates = False
 
 
-    def _insert(self, string, index):
-        current = string[index]
-        print(current)
-        if current < self._char:
-            if self._lt is None:
-                self._lt = Node(string[index])
-            self._lt._insert(string, index)
-        elif current > self._char:
-            if self._gt is None:
-                self._gt = Node(string[index])
-            self._gt._insert(string, index)
-        else:
-            if self._eq is None:
-                self._eq = Node(string[index])
-            if index + 1 < len(string):
-                self._eq._insert(string, index + 1)
-            else:
-                self._string = string
-                self._terminates = True
-
     def __repr__(self):
         if not self._char:
             return f"terminates: {self._terminates}"
@@ -38,21 +18,15 @@ class TernarySearchTree:
 
     def __init__(self):
         self._root: Node = Node('')
-        self._size = 0
 
     def insert(self, string):
         if len(string) == 0:
-            if self._root._terminates is False:
-                self._size = self._size + 1
             self._root._terminates = True
             self._root._string = string
         else:
             self._root = self._insert(self._root, 0, string)
-            self._size = self._size + 1
 
     def _insert(self, node, index, string):
-        if index == len(string):
-            return
         current = string[index]
         if node is None:
             node = Node(current)
@@ -61,15 +35,16 @@ class TernarySearchTree:
         elif current > node._char:
             node._gt = self._insert(node._gt, index, string)
         else:
-            node._eq = self._insert(node._eq, index + 1, string)
             if index + 1 == len(string):
                 node._terminates = True
                 node._string = string
+            else:
+                node._eq = self._insert(node._eq, index + 1, string)
 
         return node
 
     def __len__(self):
-        return self._size
+        return len(self.all_strings())
 
     def __repr__(self):
         lines = []
